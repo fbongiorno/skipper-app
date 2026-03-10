@@ -1,21 +1,21 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY ?? '' })
 
 export async function POST(req: NextRequest) {
-  try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return NextResponse.json({ error: 'ANTHROPIC_API_KEY is not configured on the server.' }, { status: 500 })
-    }
-    const body = await req.json()
-    const { departure, destination, duration, boatType, experience } = body
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY is not configured.' }), { status: 500 })
+  }
 
-    if (!departure || !destination) {
-      return NextResponse.json({ error: 'Departure and destination are required' }, { status: 400 })
-    }
+  const body = await req.json()
+  const { departure, destination, duration, boatType, experience } = body
 
-    const prompt = `You are Skipper, an expert nautical trip planner with deep knowledge of sailing routes, maritime weather, and seamanship.
+  if (!departure || !destination) {
+    return new Response(JSON.stringify({ error: 'Departure and destination are required' }), { status: 400 })
+  }
+
+  const prompt = `You are Skipper, an expert nautical trip planner with deep knowledge of sailing routes, maritime weather, and seamanship.
 
 Plan a boat trip with these details:
 - Departure: ${departure}
@@ -68,25 +68,44 @@ Provide a trip plan in this EXACT JSON format (no markdown, no extra text, just 
   }
 }`
 
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 4096,
-      messages: [{ role: 'user', content: prompt }],
-    })
+  const encoder = new TextEncoder()
 
-    const content = message.content[0]
-    if (content.type !== 'text') {
-      throw new Error('Unexpected response type')
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        let fullText = ''
+
+        const anthropicStream = client.messages.stream({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 4096,
+          messages: [{ role: 'user', content: prompt }],
+        })
+
+        for await (const chunk of anthropicStream) {
+          if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+            fullText += chunk.delta.text
+            // Send a heartbeat so the client knows we're still working
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ status: 'generating' })}\n\n`))
+          }
+        }
+
+        const cleaned = fullText.replace(/```json|```/g, '').trim()
+        const tripPlan = JSON.parse(cleaned)
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ tripPlan })}\n\n`))
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Unknown error'
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: `Failed to plan trip: ${msg}` })}\n\n`))
+      } finally {
+        controller.close()
+      }
     }
+  })
 
-    // Clean and parse JSON
-    const cleaned = content.text.replace(/```json|```/g, '').trim()
-    const tripPlan = JSON.parse(cleaned)
-
-    return NextResponse.json({ tripPlan })
-  } catch (error: unknown) {
-    console.error('Trip planning error:', error)
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: `Failed to plan trip: ${message}` }, { status: 500 })
-  }
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  })
 }

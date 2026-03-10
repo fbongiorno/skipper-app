@@ -46,8 +46,17 @@ export default function Home() {
   const [boatType, setBoatType] = useState('')
   const [experience, setExperience] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingStep, setLoadingStep] = useState(0)
   const [tripPlan, setTripPlan] = useState<TripPlan | null>(null)
   const [error, setError] = useState('')
+
+  const loadingMessages = [
+    '⚓ Charting your course...',
+    '🌊 Checking sea conditions...',
+    '🧭 Plotting waypoints...',
+    '⛵ Preparing your voyage plan...',
+    '📋 Finalising checklist...',
+  ]
 
   const handlePlan = async () => {
     if (!departure.trim() || !destination.trim()) {
@@ -56,7 +65,12 @@ export default function Home() {
     }
     setError('')
     setLoading(true)
+    setLoadingStep(0)
     setTripPlan(null)
+
+    const stepInterval = setInterval(() => {
+      setLoadingStep(prev => (prev + 1) % 5)
+    }, 1800)
 
     try {
       const res = await fetch('/api/plan-trip', {
@@ -64,12 +78,31 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ departure, destination, duration, boatType, experience }),
       })
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
-      setTripPlan(data.tripPlan)
+
+      if (!res.body) throw new Error('No response body')
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const text = decoder.decode(value)
+        for (const line of text.split('\n')) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6))
+              if (data.error) throw new Error(data.error)
+              if (data.tripPlan) setTripPlan(data.tripPlan)
+            } catch (parseErr) {
+              if (parseErr instanceof Error && parseErr.message.startsWith('Failed')) throw parseErr
+            }
+          }
+        }
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {
+      clearInterval(stepInterval)
       setLoading(false)
     }
   }
@@ -202,7 +235,7 @@ export default function Home() {
                     <span className="wave-bar" />
                     <span className="wave-bar" />
                   </span>
-                  Plotting your course...
+                  {loadingMessages[loadingStep]}
                 </span>
               ) : (
                 '⚓ Plan My Trip'
