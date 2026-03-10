@@ -66,7 +66,7 @@ Provide a comprehensive trip plan in this EXACT JSON format (no markdown, no ext
 }`
 
     const message = await client.messages.create({
-      model: 'claude-opus-4-5',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }],
     })
