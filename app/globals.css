@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #0a1628;
+  --deep: #0d1f3c;
+  --ocean: #1a3a5c;
+  --wave: #2563a8;
+  --seafoam: #4db6ac;
+  --gold: #c9a84c;
+  --cream: #f5f0e8;
+  --mist: #a8b8c8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--navy);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.font-display { font-family: 'Playfair Display', serif; }
+
+/* Animated ocean background */
+.ocean-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(37, 99, 168, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(77, 182, 172, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 60% 80%, rgba(10, 22, 40, 0.9) 0%, transparent 60%),
+    linear-gradient(180deg, #0a1628 0%, #0d1f3c 50%, #0a1628 100%);
+}
+
+.wave-lines {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 40px,
+      rgba(37, 99, 168, 0.03) 40px,
+      rgba(37, 99, 168, 0.03) 41px
+    );
+}
+
+/* Card styles */
+.glass-card {
+  background: rgba(13, 31, 60, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(169, 184, 200, 0.12);
+  border-radius: 16px;
+}
+
+.gold-border {
+  border: 1px solid rgba(201, 168, 76, 0.3);
+}
+
+/* Input styles */
+.nautical-input {
+  background: rgba(10, 22, 40, 0.6);
+  border: 1px solid rgba(169, 184, 200, 0.2);
+  border-radius: 10px;
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.1rem;
+  width: 100%;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.nautical-input:focus {
+  border-color: var(--seafoam);
+  box-shadow: 0 0 0 3px rgba(77, 182, 172, 0.1);
+}
+
+.nautical-input::placeholder { color: var(--mist); opacity: 0.6; }
+
+/* Button */
+.btn-primary {
+  background: linear-gradient(135deg, var(--wave) 0%, var(--seafoam) 100%);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0.9rem 2rem;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 99, 168, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Loading animation */
+@keyframes pulse-wave {
+  0%, 100% { opacity: 0.4; transform: scaleY(0.8); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+.wave-bar {
+  width: 4px;
+  height: 20px;
+  background: var(--seafoam);
+  border-radius: 2px;
+  animation: pulse-wave 1s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(2) { animation-delay: 0.15s; }
+.wave-bar:nth-child(3) { animation-delay: 0.3s; }
+.wave-bar:nth-child(4) { animation-delay: 0.45s; }
+.wave-bar:nth-child(5) { animation-delay: 0.6s; }
+
+/* Result sections */
+.section-tag {
+  background: rgba(77, 182, 172, 0.1);
+  border: 1px solid rgba(77, 182, 172, 0.25);
+  border-radius: 6px;
+  color: var(--seafoam);
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  padding: 0.2rem 0.6rem;
+  text-transform: uppercase;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid rgba(169, 184, 200, 0.1);
+  margin: 1.5rem 0;
+}
+
+/* Scroll */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--navy); }
+::-webkit-scrollbar-thumb { background: var(--ocean); border-radius: 3px; }
+
+/* Fade in animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.fade-up-delay-1 { animation-delay: 0.1s; opacity: 0; }
+.fade-up-delay-2 { animation-delay: 0.2s; opacity: 0; }
+.fade-up-delay-3 { animation-delay: 0.3s; opacity: 0; }
+
+/* Compass decoration */
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.compass-rotate { animation: rotate-slow 20s linear infinite; }
