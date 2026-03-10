@@ -24,7 +24,7 @@ Plan a boat trip with these details:
 - Boat type: ${boatType || 'sailboat'}
 - Skipper experience level: ${experience || 'intermediate'}
 
-Provide a comprehensive trip plan in this EXACT JSON format (no markdown, no extra text, just valid JSON):
+Provide a trip plan in this EXACT JSON format (no markdown, no extra text, just valid JSON — keep all string values concise, under 20 words each):
 {
   "tripName": "Creative name for this voyage",
   "summary": "2-3 sentence overview of the trip",
@@ -70,7 +70,7 @@ Provide a comprehensive trip plan in this EXACT JSON format (no markdown, no ext
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 3000,
+      max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     })
 
