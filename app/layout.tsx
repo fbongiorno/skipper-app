@@ -2,12 +2,12 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Skipper — AI Boat Trip Planner',
-  description: 'Plan your perfect sailing trip with AI. Routes, weather, checklists, and costs — all in seconds.',
+  title: 'Skipper — Boat Trip Planner',
+  description: 'Plan your perfect sailing trip. Routes, weather, checklists, and costs — all in seconds.',
   keywords: 'boat trip planner, sailing route, nautical planner, skipper, boat rental',
   openGraph: {
-    title: 'Skipper — AI Boat Trip Planner',
-    description: 'Plan your perfect sailing trip with AI.',
+    title: 'Skipper — Boat Trip Planner',
+    description: 'Plan your perfect sailing trip.',
     url: 'https://skipper.com',
     siteName: 'Skipper',
   },

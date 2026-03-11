@@ -130,7 +130,7 @@ export default function Home() {
             Chart Your Course
           </h1>
           <p className="text-mist text-lg font-light max-w-lg mx-auto" style={{color: 'var(--mist)'}}>
-            AI-powered trip planning for sailors and boaters. Routes, weather, checklists, and costs — in seconds.
+            Expert trip planning for sailors and boaters. Routes, weather, checklists, and costs — in seconds.
           </p>
         </header>
 
@@ -428,7 +428,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="text-center py-8 px-4" style={{borderTop: '1px solid rgba(255,255,255,0.06)'}}>
           <p className="text-xs" style={{color: 'var(--mist)', opacity: 0.5}}>
-            © {new Date().getFullYear()} Skipper.com — AI-Powered Nautical Trip Planning
+            © {new Date().getFullYear()} Skipper.com — Nautical Trip Planning
           </p>
         </footer>
       </div>
